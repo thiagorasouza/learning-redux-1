@@ -1,4 +1,5 @@
 import { useAppSelector } from '@/app/hooks'
+import { PostAuthor } from '@/features/posts/PostAuthor'
 import { selectPostById } from '@/features/posts/postsSlice'
 import { Link, useParams } from 'react-router-dom'
 
@@ -20,6 +21,9 @@ export const SinglePostPage = () => {
       <article>
         <h2>{post.title}</h2>
         <p className="post-content">{post.content}</p>
+        <p>
+          <PostAuthor userId={post.user} />
+        </p>
         <Link to={`/posts/${post.id}/edit`}>Edit Post</Link>
       </article>
     </section>
