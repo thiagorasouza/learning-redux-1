@@ -1,4 +1,5 @@
 import { RootState } from '@/app/store'
+import { userLoggedOut } from '@/features/auth/authSlice'
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
 import { sub } from 'date-fns'
 
@@ -85,6 +86,11 @@ const postsSlices = createSlice({
         post.reactions[reaction]++
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(userLoggedOut, (state) => {
+      return []
+    })
   },
 })
 
