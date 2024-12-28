@@ -1,8 +1,9 @@
 import { useAppSelector } from '@/app/hooks'
+import { selectAllPosts } from '@/features/posts/postsSlice'
 import { Link } from 'react-router-dom'
 
 export const PostsList = () => {
-  const posts = useAppSelector((state) => state.posts)
+  const posts = useAppSelector(selectAllPosts)
 
   return (
     <section className="posts-list">
