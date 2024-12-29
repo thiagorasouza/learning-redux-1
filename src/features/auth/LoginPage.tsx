@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
-import { userLoggedIn } from '@/features/auth/authSlice'
+import { login } from '@/features/auth/authSlice'
 import { selectAllUsers } from '@/features/users/usersSlice'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -17,13 +17,13 @@ export const LoginPage = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent<LoginPageElements>) => {
+  const handleSubmit = async (e: React.FormEvent<LoginPageElements>) => {
     e.preventDefault()
 
     const { elements } = e.currentTarget
     const username = elements.username.value
 
-    dispatch(userLoggedIn(username))
+    await dispatch(login(username))
     navigate('/posts')
   }
 
