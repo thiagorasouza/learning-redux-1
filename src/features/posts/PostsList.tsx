@@ -47,12 +47,13 @@ export const PostsList = () => {
     const orderedPosts = [...posts].sort((a, b) => b.date.localeCompare(a.date))
     content = orderedPosts.map((post) => <PostExcerpt post={post} />)
   } else if (postsStatus === 'failed') {
-    content = <div>postsError</div>
+    content = <div>{postsError}</div>
   }
 
   return (
     <section className="posts-list">
       <h2>Posts</h2>
+      {content}
     </section>
   )
 }
