@@ -1,21 +1,13 @@
-import { useAppDispatch, useAppSelector } from '@/app/hooks'
-import { RootState } from '@/app/store'
 import { Spinner } from '@/components/Spinner'
 import { TimeAgo } from '@/components/TimeAgo'
+import { useGetPostsQuery } from '@/features/api/apiSlice'
 import { PostAuthor } from '@/features/posts/PostAuthor'
-import {
-  fetchPosts,
-  selectPostById,
-  selectPostsError,
-  selectPostsIds,
-  selectPostsStatus,
-} from '@/features/posts/postsSlice'
+import { Post } from '@/features/posts/postsSlice'
 import { ReactionButtons } from '@/features/posts/ReactionButtons'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
-export const PostExcerpt = ({ postId }: { postId: string }) => {
-  const post = useAppSelector((state: RootState) => selectPostById(state, postId))
+export const PostExcerpt = ({ post }: { post: Post }) => {
   return (
     <article className="post-excerpt" key={post.id}>
       <h3>
@@ -34,27 +26,18 @@ export const PostExcerpt = ({ postId }: { postId: string }) => {
 }
 
 export const PostsList = () => {
-  const orderedIds = useAppSelector(selectPostsIds)
-  const postsStatus = useAppSelector(selectPostsStatus)
-  const postsError = useAppSelector(selectPostsError)
-  const dispatch = useAppDispatch()
+  const { data: posts = [], isLoading, isSuccess, isError, error } = useGetPostsQuery()
 
-  useEffect(() => {
-    if (postsStatus === 'idle') {
-      dispatch(fetchPosts())
-    }
-  }, [dispatch, postsStatus, fetchPosts])
-
-  if (postsStatus === 'pending') {
-    return <Spinner text="Loading..." />
-  }
+  const sortedPosts = useMemo(() => [...posts].sort((a, b) => b.date.localeCompare(a.date)), [posts])
 
   let content: ReactNode
 
-  if (postsStatus === 'succeeded') {
-    content = orderedIds.map((postId) => <PostExcerpt postId={postId} key={postId} />)
-  } else if (postsStatus === 'failed') {
-    content = <div>{postsError}</div>
+  if (isLoading) {
+    content = <Spinner text="Loading..." />
+  } else if (isSuccess) {
+    content = sortedPosts.map((post) => <PostExcerpt post={post} key={post.id} />)
+  } else if (isError) {
+    content = <div>{error.toString()}</div>
   }
 
   return (
