@@ -4,6 +4,7 @@ import { useGetPostsQuery } from '@/features/api/apiSlice'
 import { PostAuthor } from '@/features/posts/PostAuthor'
 import { Post } from '@/features/posts/postsSlice'
 import { ReactionButtons } from '@/features/posts/ReactionButtons'
+import classNames from 'classnames'
 import { ReactNode, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -26,7 +27,7 @@ export const PostExcerpt = ({ post }: { post: Post }) => {
 }
 
 export const PostsList = () => {
-  const { data: posts = [], isLoading, isSuccess, isError, error } = useGetPostsQuery()
+  const { data: posts = [], isLoading, isFetching, isSuccess, isError, error, refetch } = useGetPostsQuery()
 
   const sortedPosts = useMemo(() => [...posts].sort((a, b) => b.date.localeCompare(a.date)), [posts])
 
@@ -35,7 +36,13 @@ export const PostsList = () => {
   if (isLoading) {
     content = <Spinner text="Loading..." />
   } else if (isSuccess) {
-    content = sortedPosts.map((post) => <PostExcerpt post={post} key={post.id} />)
+    content = (
+      <div className={classNames('posts-container', { disabled: isFetching })}>
+        {sortedPosts.map((post) => (
+          <PostExcerpt post={post} key={post.id} />
+        ))}
+      </div>
+    )
   } else if (isError) {
     content = <div>{error.toString()}</div>
   }
@@ -43,6 +50,7 @@ export const PostsList = () => {
   return (
     <section className="posts-list">
       <h2>Posts</h2>
+      <button onClick={refetch}>Refetch</button>
       {content}
     </section>
   )

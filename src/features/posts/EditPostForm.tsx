@@ -1,5 +1,4 @@
-import { useAppDispatch, useAppSelector } from '@/app/hooks'
-import { postUpdated, selectPostById } from '@/features/posts/postsSlice'
+import { useEditPostMutation, useGetPostQuery } from '@/features/api/apiSlice'
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -14,10 +13,10 @@ interface EditPostFormElements extends HTMLFormElement {
 
 export const EditPostForm = () => {
   const { postId } = useParams()
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const post = useAppSelector((state) => selectPostById(state, postId!))
+  const { data: post } = useGetPostQuery(postId!)
+  const [editPost] = useEditPostMutation()
 
   if (!post) {
     return (
@@ -27,7 +26,7 @@ export const EditPostForm = () => {
     )
   }
 
-  const handleSubmit = (e: React.FormEvent<EditPostFormElements>) => {
+  const handleSubmit = async (e: React.FormEvent<EditPostFormElements>) => {
     e.preventDefault()
 
     const { elements } = e.currentTarget
@@ -35,7 +34,7 @@ export const EditPostForm = () => {
     const content = elements.postContent.value
 
     if (title && content) {
-      dispatch(postUpdated({ id: post.id, title, content }))
+      await editPost({ id: post.id, title, content })
       navigate(`/posts/${post.id}`)
     }
   }

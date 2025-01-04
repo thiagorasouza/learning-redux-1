@@ -1,7 +1,8 @@
-import { useAppDispatch, useAppSelector } from '@/app/hooks'
+import { useAppSelector } from '@/app/hooks'
+import { useAddNewPostMutation } from '@/features/api/apiSlice'
 import { selectCurrentUsername } from '@/features/auth/authSlice'
-import { addNewPost } from '@/features/posts/postsSlice'
-import React, { useState } from 'react'
+
+import React from 'react'
 
 interface AddPostFormFields extends HTMLFormControlsCollection {
   postTitle: HTMLInputElement
@@ -13,10 +14,8 @@ interface AddPostFormElements extends HTMLFormElement {
 }
 
 export const AddPostForm = () => {
-  const [addRequestStatus, setAddRequestStatus] = useState<'idle' | 'pending'>('idle')
-  const dispatch = useAppDispatch()
+  const [addNewPost, { isLoading }] = useAddNewPostMutation()
 
-  // const users = useAppSelector(selectAllUsers)
   const userId = useAppSelector(selectCurrentUsername)!
 
   const handleSubmit = async (e: React.FormEvent<AddPostFormElements>) => {
@@ -29,13 +28,10 @@ export const AddPostForm = () => {
     const form = e.currentTarget
 
     try {
-      setAddRequestStatus('pending')
-      await dispatch(addNewPost({ title, content, user: userId })).unwrap()
+      await addNewPost({ title, content, user: userId }).unwrap()
       form.reset()
     } catch (error) {
       console.log(`Failed to add new post: ${error}`)
-    } finally {
-      setAddRequestStatus('idle')
     }
   }
 
@@ -48,7 +44,7 @@ export const AddPostForm = () => {
         <label htmlFor="postContent">Content:</label>
         <textarea name="postContent" id="postContent" defaultValue="" required></textarea>
 
-        <button disabled={addRequestStatus === 'pending'}>Save Post</button>
+        <button disabled={isLoading}>Save Post</button>
       </form>
     </section>
   )

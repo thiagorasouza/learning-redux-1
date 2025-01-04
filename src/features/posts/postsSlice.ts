@@ -2,9 +2,9 @@ import { client } from '@/api/client'
 import { AppStartListening } from '@/app/listenerMiddleware'
 import { RootState } from '@/app/store'
 import { createAppAsyncThunk } from '@/app/withTypes'
+import { apiSlice } from '@/features/api/apiSlice'
 import { logout } from '@/features/auth/authSlice'
 import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit'
-import { totalmem } from 'os'
 
 export interface PostsState extends EntityState<Post, string> {
   status: 'idle' | 'pending' | 'succeeded' | 'failed'
@@ -28,15 +28,15 @@ export interface Post {
   reactions: Reactions
 }
 
-type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
+export type PostUpdate = Pick<Post, 'id' | 'title' | 'content'>
 
-type NewPost = Pick<Post, 'title' | 'content' | 'user'>
+export type NewPost = Pick<Post, 'title' | 'content' | 'user'>
 
 export type ReactionName = keyof Reactions
 
 export const addPostsListeners = (startAppListening: AppStartListening) => {
   startAppListening({
-    actionCreator: addNewPost.fulfilled,
+    matcher: apiSlice.endpoints.addNewPost.matchFulfilled,
     effect: async (action, listenerApi) => {
       const { toast } = await import('react-tiny-toast')
 
