@@ -1,7 +1,11 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { UserIcon } from '@/components/UserIcon'
 import { logout } from '@/features/auth/authSlice'
-import { fetchNotifications, selectUnreadNotificationsCount } from '@/features/notifications/notificationsSlice'
+import {
+  fetchNotificationsWebsocket,
+  selectUnreadNotificationsCount,
+  useGetNotificationsQuery,
+} from '@/features/notifications/notificationsSlice'
 import { selectCurrentUser } from '@/features/users/usersSlice'
 import React from 'react'
 import { Link } from 'react-router-dom'
@@ -12,12 +16,14 @@ export const Navbar = () => {
   const dispatch = useAppDispatch()
   const isLoggedIn = !!user
 
+  useGetNotificationsQuery()
+
   const onLogoutClick = async () => {
     await dispatch(logout())
   }
 
   const fetchNewNotifications = async () => {
-    await dispatch(fetchNotifications())
+    await dispatch(fetchNotificationsWebsocket())
   }
 
   return (
